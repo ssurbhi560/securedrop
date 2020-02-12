@@ -4,7 +4,7 @@ Flask-Testing
 flaky
 mock
 pillow
-pip-tools>=4.0.0
+pip-tools==4.4.0
 py
 pytest
 pytest-cov
