@@ -65,6 +65,7 @@ function docker_run() {
            -p "127.0.0.1:${SD_HOSTPORT_SI}:8080" \
            -p "127.0.0.1:${SD_HOSTPORT_JI}:8081" \
            -e NUM_SOURCES \
+           -e CLIENT_TEST_DATA \
            -e LC_ALL=C.UTF-8 \
            -e LANG=C.UTF-8 \
            -e PAGE_LAYOUT_LOCALES \

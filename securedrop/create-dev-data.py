@@ -28,6 +28,27 @@ replies = cycle([
     '<strong>This text should not be bold</strong>!'
 ])
 
+spcial_submissions = cycle([
+    """~!@#$%^&*()_+{}|:"<>?~!@#$%^&*()_+{}|:"<>?~!@#$%^&*()_+{}|:"<>?~!@#$%""",
+    """Ω≈ç√∫˜µ≤≥÷
+åß∂ƒ©˙∆˚¬…æ
+œ∑´®†¥¨ˆøπ“‘
+¡™£¢∞§¶•ªº–≠
+¸˛Ç◊ı˜Â¯˘¿
+ÅÍÎÏ˝ÓÔÒÚÆ☃
+Œ„´‰ˇÁ¨ˆØ∏”""",
+    """!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!$"""  # noqa: W605, E501
+    """............................................................................................................................							.""",  # noqa: W605,    E501
+
+    """thisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwithoutspacesordashesthisisalongwordwit💩houtspacesordashes""",  # noqa: W605, E501
+
+    """😍😍😍😍🔥🔥🔥🔥🔥🖧Thelastwas3networkedcomuters📟📸longwordwit💩houtspacesordashes"""  # noqa: W605, E501
+
+
+
+            ]
+        )
+
 
 def main(staging=False):
     app = journalist_app.create_app(config)
@@ -66,6 +87,10 @@ def main(staging=False):
                 )
                 continue
             create_source_and_submissions(i, num_sources)
+
+        client_test = int(os.getenv('CLIENT_TEST_DATA', 0))
+        for i in range(1, client_test):
+            create_source_and_submissions(i, client_test, client_test_data=True)
         # Now let us delete one journalist
         db.session.delete(journalist_tobe_deleted)
         db.session.commit()
@@ -92,7 +117,7 @@ def add_test_user(username, password, otp_secret, is_admin=False,
 
 
 def create_source_and_submissions(
-    source_index, source_count, num_submissions=2, num_replies=2, journalist_who_replied=None
+    source_index, source_count, num_submissions=2, num_replies=2, journalist_who_replied=None, client_test_data=False  # noqa: W605, E501
 ):
     # Store source in database
     codename = current_app.crypto_util.genrandomid()
@@ -110,11 +135,15 @@ def create_source_and_submissions(
     # Generate some test submissions
     for _ in range(num_submissions):
         source.interaction_count += 1
+        if client_test_data:
+            submission_text = next(spcial_submissions)
+        else:
+            submission_text = next(submissions)
         fpath = current_app.storage.save_message_submission(
             source.filesystem_id,
             source.interaction_count,
             source.journalist_filename,
-            next(submissions)
+            submission_text
         )
         source.last_updated = datetime.datetime.utcnow()
         submission = Submission(source, fpath)
