@@ -549,8 +549,11 @@ def test_delete_collections(mocker, journalist_app, source_app, test_journo):
         ), follow_redirects=True)
         assert resp.status_code == 200
         text = resp.data.decode('utf-8')
-        assert "{} collections deleted".format(num_sources) in text
+        assert "{} collections scheduled for deletion".format(num_sources) in text
         assert async_genkey.called
+
+        # simulate the source_deleter's work
+        journalist_app_module.utils.purge_deleted_sources()
 
         # Make sure the collections are deleted from the filesystem
         def assertion():
